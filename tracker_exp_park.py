@@ -77,13 +77,15 @@ joy = joystick.Joystick(0)
 joy.status = NOT_STARTED
 
 # setup some python lists for storing info about the mouse-- NOTE: distance measures from crosshair center to closest edge of target!
-mousex, mousey, targetx, targety, distance, xDistance, yDistance, onTarget, rmse, ori, dir, trialList, blockList, condList, subject, onTargetPercent, pctXOff, pctYOff, numFramesInTarget = ([] for i in range(19))
+mousex, mousey, targetx, targety, distance, xDistance, yDistance, onTarget, rmse, trialList, blockList, subject, onTargetPercent, pctXOff, pctYOff, numFramesInTarget = ([] for i in range(16))
 
 # variables
 numTrials = 128
 trialTime = 600 # frames, about 10s
 speed = .01
 radius = .125
+dual = False
+locArr = [-0.875, -0.865, -0.855, -0.845, -0.835, -0.825, -0.815, -0.805, -0.795, -0.785, -0.775, -0.765, -0.755, -0.745, -0.735, -0.725, -0.715, -0.705, -0.695, -0.685, -0.675, -0.665, -0.655, -0.645, -0.635, -0.625, -0.615, -0.605, -0.595, -0.585, -0.575, -0.565, -0.555, -0.545, -0.535, -0.525, -0.515, -0.505, -0.495, -0.485, -0.475, -0.465, -0.455, -0.445, -0.435, -0.425, -0.415, -0.405, -0.395, -0.385, -0.375, -0.365, -0.355, -0.345, -0.335, -0.325, -0.315, -0.305, -0.295, -0.285, -0.275, -0.265, -0.255, -0.245, -0.235, -0.225, -0.215, -0.205, -0.195, -0.185, -0.175, -0.165, -0.155, -0.145, -0.135, -0.125, -0.115, -0.105, -0.095, -0.085, -0.075, -0.065, -0.055, -0.045, -0.035, -0.025, -0.015, -0.005, 0.005, 0.015, 0.025, 0.035, 0.045, 0.055, 0.065, 0.075, 0.085, 0.095, 0.105, 0.115, 0.125, 0.135, 0.145, 0.155, 0.165, 0.175, 0.185, 0.195, 0.205, 0.215, 0.225, 0.235, 0.245, 0.255, 0.265, 0.275, 0.285, 0.295, 0.305, 0.315, 0.325, 0.335, 0.345, 0.355, 0.365, 0.375, 0.385, 0.395, 0.405, 0.415, 0.425, 0.435, 0.445, 0.455, 0.465, 0.475, 0.485, 0.495, 0.505, 0.515, 0.525, 0.535, 0.545, 0.555, 0.565, 0.575, 0.585, 0.595, 0.605, 0.615, 0.625, 0.635, 0.645, 0.655, 0.665, 0.675, 0.685, 0.695, 0.705, 0.715, 0.725, 0.735, 0.745, 0.755, 0.765, 0.775, 0.785, 0.795, 0.805, 0.815, 0.825, 0.835, 0.845, 0.855, 0.865, 0.875, 0.865, 0.855, 0.845, 0.835, 0.825, 0.815, 0.805, 0.795, 0.785, 0.775, 0.765, 0.755, 0.745, 0.735, 0.725, 0.715, 0.705, 0.695, 0.685, 0.675, 0.665, 0.655, 0.645, 0.635, 0.625, 0.615, 0.605, 0.595, 0.585, 0.575, 0.565, 0.555, 0.545, 0.535, 0.525, 0.515, 0.505, 0.495, 0.485, 0.475, 0.465, 0.455, 0.445, 0.435, 0.425, 0.415, 0.405, 0.395, 0.385, 0.375, 0.365, 0.355, 0.345, 0.335, 0.325, 0.315, 0.305, 0.295, 0.285, 0.275, 0.265, 0.255, 0.245, 0.235, 0.225, 0.215, 0.205, 0.195, 0.185, 0.175, 0.165, 0.155, 0.145, 0.135, 0.125, 0.115, 0.105, 0.095, 0.085, 0.075, 0.065, 0.055, 0.045, 0.035, 0.025, 0.015, 0.005, -0.005, -0.015, -0.025, -0.035, -0.045, -0.055, -0.065, -0.075, -0.085, -0.095, -0.105, -0.115, -0.125, -0.135, -0.145, -0.155, -0.165, -0.175, -0.185, -0.195, -0.205, -0.215, -0.225, -0.235, -0.245, -0.255, -0.265, -0.275, -0.285, -0.295, -0.305, -0.315, -0.325, -0.335, -0.345, -0.355, -0.365, -0.375, -0.385, -0.395, -0.405, -0.415, -0.425, -0.435, -0.445, -0.455, -0.465, -0.475, -0.485, -0.495, -0.505, -0.515, -0.525, -0.535, -0.545, -0.555, -0.565, -0.575, -0.585, -0.595, -0.605, -0.615, -0.625, -0.635, -0.645, -0.655, -0.665, -0.675, -0.685, -0.695, -0.705, -0.715, -0.725, -0.735, -0.745, -0.755, -0.765, -0.775, -0.785, -0.795, -0.805, -0.815, -0.825, -0.835, -0.845, -0.855, -0.865, -0.875, -0.865, -0.855, -0.845, -0.835, -0.825, -0.815, -0.805, -0.795, -0.785, -0.775, -0.765, -0.755, -0.745, -0.735, -0.725, -0.715, -0.705, -0.695, -0.685, -0.675, -0.665, -0.655, -0.645, -0.635, -0.625, -0.615, -0.605, -0.595, -0.585, -0.575, -0.565, -0.555, -0.545, -0.535, -0.525, -0.515, -0.505, -0.495, -0.485, -0.475, -0.465, -0.455, -0.445, -0.435, -0.425, -0.415, -0.405, -0.395, -0.385, -0.375, -0.365, -0.355, -0.345, -0.335, -0.325, -0.315, -0.305, -0.295, -0.285, -0.275, -0.265, -0.255, -0.245, -0.235, -0.225, -0.215, -0.205, -0.195, -0.185, -0.175, -0.165, -0.155, -0.145, -0.135, -0.125, -0.115, -0.105, -0.095, -0.085, -0.075, -0.065, -0.055, -0.045, -0.035, -0.025, -0.015, -0.005, 0.005, 0.015, 0.025, 0.035, 0.045, 0.055, 0.065, 0.075, 0.085, 0.095, 0.105, 0.115, 0.125, 0.135, 0.145, 0.155, 0.165, 0.175, 0.185, 0.195, 0.205, 0.215, 0.225, 0.235, 0.245, 0.255, 0.265, 0.275, 0.285, 0.295, 0.305, 0.315, 0.325, 0.335, 0.345, 0.355, 0.365, 0.375, 0.385, 0.395, 0.405, 0.415, 0.425, 0.435, 0.445, 0.455, 0.465, 0.475, 0.485, 0.495, 0.505, 0.515, 0.525, 0.535, 0.545, 0.555, 0.565, 0.575, 0.585, 0.595, 0.605, 0.615, 0.625, 0.635, 0.645, 0.655, 0.665, 0.675, 0.685, 0.695, 0.705, 0.715, 0.725, 0.735, 0.745, 0.755, 0.765, 0.775, 0.785, 0.795, 0.805, 0.815, 0.825, 0.835, 0.845, 0.855, 0.865, 0.875, 0.865, 0.855, 0.845, 0.835, 0.825, 0.815, 0.805, 0.795, 0.785, 0.775, 0.765, 0.755, 0.745, 0.735, 0.725, 0.715, 0.705, 0.695, 0.685, 0.675, 0.665, 0.655, 0.645, 0.635, 0.625, 0.615, 0.605, 0.595, 0.585, 0.575, 0.565, 0.555, 0.545, 0.535, 0.525, 0.515, 0.505, 0.495, 0.485, 0.475, 0.465, 0.455, 0.445, 0.435, 0.425, 0.415, 0.405, 0.395, 0.385, 0.375, 0.365, 0.355, 0.345, 0.335, 0.325, 0.315, 0.305, 0.295, 0.285, 0.275, 0.265, 0.255, 0.245, 0.235, 0.225, 0.215, 0.205, 0.195, 0.185, 0.175, 0.165, 0.155, 0.145, 0.135]
 
 #add RMEs
 def jsCalc(joyPos, val):
@@ -194,7 +196,7 @@ def infoScreen(display):
     crosshair.setAutoDraw(False)
     win.flip()
 
-def trialScreen(trialNum, origin, direction):
+def trialScreen(trialNum, startPos):
     endExpNow = False  # flag for 'escape' or other condition => quit the exp
 
     #create visual objects
@@ -204,8 +206,10 @@ def trialScreen(trialNum, origin, direction):
         trialName = 'Training Trial ' + str(trialNum%10)
     text = visual.TextStim(win=win, text=trialName, height=0.075)
     #***replace it with target***
-    #copy = visual.Circle(win=win, units='norm', radius=.125, fillColor=[1,-1,-1],
-    #    fillColorSpace='rgb', opacity=0, depth=-1.0, interpolate=True)
+    copy = visual.Circle(win=win, name='copy', units='norm', radius=.125,
+    	fillColor=[1,-1,-1], fillColorSpace='rgb', opacity=.5, depth=-1.0, interpolate=True)
+    copy.setPos((0, startPos))
+    copy.setAutoDraw(True)
 
     t = 0
     trialClock.reset()  # clock
@@ -224,6 +228,7 @@ def trialScreen(trialNum, origin, direction):
         frameN = frameN + 1  # number of completed frames (so 0 is 1st frame)
 
         if frameN > 120:
+            copy.setAutoDraw(False)
             continueRoutine = False
 
         # *text* updates
@@ -249,3 +254,143 @@ def trialScreen(trialNum, origin, direction):
         # refresh the screen
         if continueRoutine:  # don't flip if routine is over or you get a blank screen
             win.flip()
+
+def runTrial(trialNum, locArr, dual):
+    # ------Prepare to start Routine "trial"-------
+    #set up some variables
+    trialDist = []
+
+    continueRoutine = True
+    framesInTarget = 0
+
+    # -------Start Routine "trial"-------
+    for frameN in range(0,trialTime):
+        target.setAutoDraw(True)
+
+        # crosshair updates
+        chxPos = jsCalc(joy.getX(), xval)
+        chyPos = jsCalc(joy.getY(), yval)
+        crosshair.setPos((chxPos, chyPos))
+        crosshair.setAutoDraw(True)
+        # x position is always 0, y updates to the next value in the array
+        currX = 0
+        currY = locArr[frameN]
+        target.setPos((currX, currY))
+
+        # save frame information
+        trialList.append(trialNum)
+        mousex.append(chxPos)
+        mousey.append(chyPos)
+        subject.append(expInfo['participant'])
+        xDist = chxPos - currX
+        yDist = chyPos - currY
+        hypotenuse = sqrt( abs(xDist*xDist) + abs(yDist*yDist) )
+        xDistance.append(xDist)
+        yDistance.append(yDist)
+        distance.append(hypotenuse-radius)  #this will be included in the csv output
+        trialDist.append(hypotenuse)    #this is used to compute RMSE
+        if max(abs(xDist),abs(yDist)) <= radius:
+            framesInTarget += 1
+            onTarget.append(1)
+        else:
+            onTarget.append(0)
+
+        # check for quit (the Esc key)
+        if endExpNow or event.getKeys(keyList=["escape"]):
+            core.quit()
+
+        # refresh the screen
+        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+            win.flip()
+
+    #presents trial feedback
+    pct = (framesInTarget/(frameN+1))*100
+    residual2Sum = 0
+    pctX = 0 # this is % NOT in target
+    pctY = 0 # this is % NOT in target
+    # what is residual2Sum measuring
+    for num in zip(xDistance[-1*trialTime:], yDistance[-1*trialTime:], trialDist[-1*trialTime:]):
+        residual2Sum += num[2]*num[2]
+        if abs(num[0]) > radius:
+            pctX += 1
+        if abs(num[1]) > radius:
+            pctY += 1
+    pctX = (pctX/(frameN+1))*100 # LEFT HAND
+    pctY = (pctY/(frameN+1))*100 # RIGHT HAND
+    rootMeanSquaredError = sqrt(residual2Sum)
+    target.setAutoDraw(False)
+    crosshair.setAutoDraw(False)
+
+    for i in range(0, frameN+1):
+        onTargetPercent.append(pct)
+        pctXOff.append(pctX)
+        pctYOff.append(pctY)
+        rmse.append(rootMeanSquaredError)
+        numFramesInTarget.append(framesInTarget)
+
+    timer = clock.CountdownTimer(3)
+    while timer.getTime() > 0:
+        win.flip()
+        # check for quit (the Esc key)
+        if endExpNow or event.getKeys(keyList=["escape"]):
+            core.quit()
+
+    crosshair.setAutoDraw(True)
+
+def runTraining():
+    #bottom VT
+    trialScreen(901, locArr[0])
+    runTrial(901, locArr, False)
+    #top VT
+    trialScreen(902, locArr[0])
+    runTrial(901, locArr, False)
+
+def runExp():
+    for trialNum in range (1,numTrials+1):
+        # Determine the type of task: single or dual
+        if trialNum%2 == 1:
+            dual = False
+        else:
+            dual = True
+        trialScreen(trialNum, locArr[0])
+        runTrial(trialNum, locArr, dual)
+
+def main():
+    # variables
+    numTrials = 128
+    trialTime = 600 # frames, about 10s
+    speed = .01
+    radius = .125
+
+    # sandbox happens first
+    holdScreen('Use this screen to experiment with moving the crosshairs.')
+
+    # then training
+    infoScreen('TRAINING TRIALS')
+    runTraining() # for even subjects, external training trials are listed as 900s, internals as 800s
+    holdScreen('You have completed the training portion of this experiment.\nPlease notify the experimenter.')
+
+    # then experiment blocks
+    infoScreen('EXPERIMENT TRIALS')
+    runExp()
+
+    # Data structure-- NOTE: distance measures from crosshair center to closest edge of target!
+    data = pd.DataFrame({'mouseX': mousex, 'mouseY': mousey, 'targetX': targetx, 'targetY': targety,
+                        'distance': distance,'xDist': xDistance, 'yDist': yDistance,
+                        'onTarget': onTarget, 'onTargetPercent': onTargetPercent, 'rmse': rmse,
+                        'framesInTarget': numFramesInTarget, 'pctX': pctXOff, 'pctY': pctYOff,
+                        'trialList': trialList, 'blockList': blockList,
+                        'subject': subject})
+    data.to_csv(filename + '.csv')
+
+    # final screen and quit
+    holdScreen('You have completed the experiment.\nPlease notify the experimenter.')
+    logging.flush()
+    win.close()
+    core.quit()
+
+# calibrate the movement of the crosshair
+xval, yval = caliScreen()
+print(xval, yval)
+# run the experiment
+main()
