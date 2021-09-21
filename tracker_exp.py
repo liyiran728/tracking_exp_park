@@ -103,7 +103,7 @@ def jsCalc(joyPos, val):
 
 def caliScreen():
     spacebar = event.BuilderKeyResponse()
-    
+
     # calibration
     continueRoutine = True
     force_vals = np.array([])
@@ -116,7 +116,7 @@ def caliScreen():
         if len(keysPressed) > 0:
             continueRoutine = False
         win.flip()
-    xval = np.max(force_vals[force_vals != 0.0])  
+    xval = np.max(force_vals[force_vals != 0.0])
 
     continueRoutine = True
     force_vals = np.array([])
@@ -129,7 +129,7 @@ def caliScreen():
             continueRoutine = False
         win.flip()
     yval = np.max(force_vals[force_vals != 0.0])
-    
+
     return xval, yval
 
 def holdScreen(display):
@@ -338,10 +338,10 @@ def runTraining():
     #left HZ
     trialScreen(902, 4, 'HZ')
     runTrial(902, 4, 'HZ', 0, external)
-    
+
     if external:
         external = False
-    else: 
+    else:
         external = True
     if external:
         holdScreen(externalInst)
@@ -354,10 +354,10 @@ def runTraining():
     #right HZ
     trialScreen(804, 2, 'HZ')
     runTrial(804, 2, 'HZ', 0, external)
-    
+
     if external:
         external = False
-    else: 
+    else:
         external = True
     if external:
         infoScreen(externalInst)
@@ -370,10 +370,10 @@ def runTraining():
     #left CC
     trialScreen(906, 4, 'CC')
     runTrial(906, 4, 'CC', 0, external)
-    
+
     if external:
         external = False
-    else: 
+    else:
         external = True
     if external:
         infoScreen(externalInst)
@@ -402,7 +402,7 @@ def runMiniBlock(miniBlock, external, blockNum):
         pctX, pctY = runTrial((blockNum*4)+i-3, trial['ori'], trial['dir'], blockNum, external)
         totalX += pctX
         totalY += pctY
-        
+
     if (blockNum%4) != 0: #skip feedback at the transition between the 2 conditions, i.e. every 4 blocks
         displayFeedback(external, totalX/4, totalY/4)
 
