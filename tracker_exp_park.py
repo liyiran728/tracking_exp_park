@@ -23,6 +23,10 @@ import os  # handy system and path functions
 import sys  # to get file system encoding
 import pandas as pd
 
+# read in csv file that has experiment parameters
+# ExpDetails = pd.read_csv('path_to_file.csv')
+# ExpDetails['dualtask'][blocknum]
+
 # Ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
@@ -65,10 +69,10 @@ else:
 trialClock = core.Clock()
 x, y = [None, None]
 target = visual.Circle(win=win, name='target', units='norm', radius=.125,
-	fillColor=[1,-1,-1], fillColorSpace='rgb', opacity=.5, depth=-1.0, interpolate=True)
-crosshair = visual.ShapeStim(win=win, name='polygon', vertices='cross',
-	size=(0.075, 0.075), ori=0, pos=(0, 0), lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
-	fillColor=[-1.000,-1.000,-1.000], fillColorSpace='rgb', opacity=1, depth=0.0, interpolate=True)
+	fillColor='red', fillColorSpace='rgb', opacity=1, depth=-1.0, interpolate=True)
+crosshair = visual.Circle(win=win, name='crosshair', units='norm', radius=.075,
+	#size=(0.075, 0.075), ori=0, pos=(0, 0), lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
+	fillColor='black', fillColorSpace='rgb', opacity=1, depth=0.0, interpolate=True)
 
 # set up joystick
 joystick.backend = 'pyglet'
@@ -77,7 +81,7 @@ joy = joystick.Joystick(0)
 joy.status = NOT_STARTED
 
 # setup some python lists for storing info about the mouse-- NOTE: distance measures from crosshair center to closest edge of target!
-mousex, mousey, targetx, targety, distance, xDistance, yDistance, onTarget, rmse, trialList, blockList, subject, onTargetPercent, pctXOff, pctYOff, numFramesInTarget = ([] for i in range(16))
+mousey, targetx, targety, distance, yDistance, onTarget, rmse, trialList, blockList, subject, onTargetPercent, pctYOff, numFramesInTarget = ([] for i in range(13))
 
 # variables
 numTrials = 128
@@ -86,6 +90,7 @@ speed = .01
 radius = .125
 dual = False
 locArr = [-0.875, -0.865, -0.855, -0.845, -0.835, -0.825, -0.815, -0.805, -0.795, -0.785, -0.775, -0.765, -0.755, -0.745, -0.735, -0.725, -0.715, -0.705, -0.695, -0.685, -0.675, -0.665, -0.655, -0.645, -0.635, -0.625, -0.615, -0.605, -0.595, -0.585, -0.575, -0.565, -0.555, -0.545, -0.535, -0.525, -0.515, -0.505, -0.495, -0.485, -0.475, -0.465, -0.455, -0.445, -0.435, -0.425, -0.415, -0.405, -0.395, -0.385, -0.375, -0.365, -0.355, -0.345, -0.335, -0.325, -0.315, -0.305, -0.295, -0.285, -0.275, -0.265, -0.255, -0.245, -0.235, -0.225, -0.215, -0.205, -0.195, -0.185, -0.175, -0.165, -0.155, -0.145, -0.135, -0.125, -0.115, -0.105, -0.095, -0.085, -0.075, -0.065, -0.055, -0.045, -0.035, -0.025, -0.015, -0.005, 0.005, 0.015, 0.025, 0.035, 0.045, 0.055, 0.065, 0.075, 0.085, 0.095, 0.105, 0.115, 0.125, 0.135, 0.145, 0.155, 0.165, 0.175, 0.185, 0.195, 0.205, 0.215, 0.225, 0.235, 0.245, 0.255, 0.265, 0.275, 0.285, 0.295, 0.305, 0.315, 0.325, 0.335, 0.345, 0.355, 0.365, 0.375, 0.385, 0.395, 0.405, 0.415, 0.425, 0.435, 0.445, 0.455, 0.465, 0.475, 0.485, 0.495, 0.505, 0.515, 0.525, 0.535, 0.545, 0.555, 0.565, 0.575, 0.585, 0.595, 0.605, 0.615, 0.625, 0.635, 0.645, 0.655, 0.665, 0.675, 0.685, 0.695, 0.705, 0.715, 0.725, 0.735, 0.745, 0.755, 0.765, 0.775, 0.785, 0.795, 0.805, 0.815, 0.825, 0.835, 0.845, 0.855, 0.865, 0.875, 0.865, 0.855, 0.845, 0.835, 0.825, 0.815, 0.805, 0.795, 0.785, 0.775, 0.765, 0.755, 0.745, 0.735, 0.725, 0.715, 0.705, 0.695, 0.685, 0.675, 0.665, 0.655, 0.645, 0.635, 0.625, 0.615, 0.605, 0.595, 0.585, 0.575, 0.565, 0.555, 0.545, 0.535, 0.525, 0.515, 0.505, 0.495, 0.485, 0.475, 0.465, 0.455, 0.445, 0.435, 0.425, 0.415, 0.405, 0.395, 0.385, 0.375, 0.365, 0.355, 0.345, 0.335, 0.325, 0.315, 0.305, 0.295, 0.285, 0.275, 0.265, 0.255, 0.245, 0.235, 0.225, 0.215, 0.205, 0.195, 0.185, 0.175, 0.165, 0.155, 0.145, 0.135, 0.125, 0.115, 0.105, 0.095, 0.085, 0.075, 0.065, 0.055, 0.045, 0.035, 0.025, 0.015, 0.005, -0.005, -0.015, -0.025, -0.035, -0.045, -0.055, -0.065, -0.075, -0.085, -0.095, -0.105, -0.115, -0.125, -0.135, -0.145, -0.155, -0.165, -0.175, -0.185, -0.195, -0.205, -0.215, -0.225, -0.235, -0.245, -0.255, -0.265, -0.275, -0.285, -0.295, -0.305, -0.315, -0.325, -0.335, -0.345, -0.355, -0.365, -0.375, -0.385, -0.395, -0.405, -0.415, -0.425, -0.435, -0.445, -0.455, -0.465, -0.475, -0.485, -0.495, -0.505, -0.515, -0.525, -0.535, -0.545, -0.555, -0.565, -0.575, -0.585, -0.595, -0.605, -0.615, -0.625, -0.635, -0.645, -0.655, -0.665, -0.675, -0.685, -0.695, -0.705, -0.715, -0.725, -0.735, -0.745, -0.755, -0.765, -0.775, -0.785, -0.795, -0.805, -0.815, -0.825, -0.835, -0.845, -0.855, -0.865, -0.875, -0.865, -0.855, -0.845, -0.835, -0.825, -0.815, -0.805, -0.795, -0.785, -0.775, -0.765, -0.755, -0.745, -0.735, -0.725, -0.715, -0.705, -0.695, -0.685, -0.675, -0.665, -0.655, -0.645, -0.635, -0.625, -0.615, -0.605, -0.595, -0.585, -0.575, -0.565, -0.555, -0.545, -0.535, -0.525, -0.515, -0.505, -0.495, -0.485, -0.475, -0.465, -0.455, -0.445, -0.435, -0.425, -0.415, -0.405, -0.395, -0.385, -0.375, -0.365, -0.355, -0.345, -0.335, -0.325, -0.315, -0.305, -0.295, -0.285, -0.275, -0.265, -0.255, -0.245, -0.235, -0.225, -0.215, -0.205, -0.195, -0.185, -0.175, -0.165, -0.155, -0.145, -0.135, -0.125, -0.115, -0.105, -0.095, -0.085, -0.075, -0.065, -0.055, -0.045, -0.035, -0.025, -0.015, -0.005, 0.005, 0.015, 0.025, 0.035, 0.045, 0.055, 0.065, 0.075, 0.085, 0.095, 0.105, 0.115, 0.125, 0.135, 0.145, 0.155, 0.165, 0.175, 0.185, 0.195, 0.205, 0.215, 0.225, 0.235, 0.245, 0.255, 0.265, 0.275, 0.285, 0.295, 0.305, 0.315, 0.325, 0.335, 0.345, 0.355, 0.365, 0.375, 0.385, 0.395, 0.405, 0.415, 0.425, 0.435, 0.445, 0.455, 0.465, 0.475, 0.485, 0.495, 0.505, 0.515, 0.525, 0.535, 0.545, 0.555, 0.565, 0.575, 0.585, 0.595, 0.605, 0.615, 0.625, 0.635, 0.645, 0.655, 0.665, 0.675, 0.685, 0.695, 0.705, 0.715, 0.725, 0.735, 0.745, 0.755, 0.765, 0.775, 0.785, 0.795, 0.805, 0.815, 0.825, 0.835, 0.845, 0.855, 0.865, 0.875, 0.865, 0.855, 0.845, 0.835, 0.825, 0.815, 0.805, 0.795, 0.785, 0.775, 0.765, 0.755, 0.745, 0.735, 0.725, 0.715, 0.705, 0.695, 0.685, 0.675, 0.665, 0.655, 0.645, 0.635, 0.625, 0.615, 0.605, 0.595, 0.585, 0.575, 0.565, 0.555, 0.545, 0.535, 0.525, 0.515, 0.505, 0.495, 0.485, 0.475, 0.465, 0.455, 0.445, 0.435, 0.425, 0.415, 0.405, 0.395, 0.385, 0.375, 0.365, 0.355, 0.345, 0.335, 0.325, 0.315, 0.305, 0.295, 0.285, 0.275, 0.265, 0.255, 0.245, 0.235, 0.225, 0.215, 0.205, 0.195, 0.185, 0.175, 0.165, 0.155, 0.145, 0.135]
+colorArr = ["red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red", "red"]
 
 #add RMEs
 def jsCalc(joyPos, val):
@@ -131,6 +136,69 @@ def caliScreen():
 
     return xval, yval
 
+def responseScreen():
+    #text = visual.TextStim(win=win, text=display, height=.075)
+    #text.setAutoDraw(True)
+    endExpNow = False  # flag for 'escape' or other condition => quit the exp
+    fourcircle = visual.Circle(win=win, name='target', units='norm', radius=.125,
+    	fillColor='red', fillColorSpace='rgb', opacity=.5, depth=-1.0, pos = (0,0.675), interpolate=True)
+    threecircle = visual.Circle(win=win, name='target', units='norm', radius=.125,
+    	fillColor='red', fillColorSpace='rgb', opacity=.5, depth=-1.0, pos = (0,0.225), interpolate=True)
+    twocircle = visual.Circle(win=win, name='target', units='norm', radius=.125,
+    	fillColor='red', fillColorSpace='rgb', opacity=.5, depth=-1.0, pos = (0,-0.225), interpolate=True)
+    onecircle = visual.Circle(win=win, name='target', units='norm', radius=.125,
+    	fillColor='red', fillColorSpace='rgb', opacity=.5, depth=-1.0, pos = (0,-0.675), interpolate=True)
+    onetext = visual.TextStim(win=win, text="1", pos = (0,-0.675), height=.125)
+    twotext = visual.TextStim(win=win, text="2", pos = (0,-0.225), height=.125)
+    threetext = visual.TextStim(win=win, text="3", pos = (0,0.225), height=.125)
+    fourtext = visual.TextStim(win=win, text="4", pos = (0,0.675), height=.125)
+    # keep track of which components have finished
+    trialComponents = [joy]
+    for thisComponent in trialComponents:
+        if hasattr(thisComponent, 'status'):
+            thisComponent.status = NOT_STARTED
+
+    timer = clock.CountdownTimer(3)
+    while timer.getTime() > 0:
+        # crosshair updates
+        chyPos = jsCalc(joy.getY(), yval)
+        crosshair.setPos((0, chyPos))
+        crosshair.setAutoDraw(True)
+        onecircle.setAutoDraw(True)
+        twocircle.setAutoDraw(True)
+        threecircle.setAutoDraw(True)
+        fourcircle.setAutoDraw(True)
+        onetext.setAutoDraw(True)
+        twotext.setAutoDraw(True)
+        threetext.setAutoDraw(True)
+        fourtext.setAutoDraw(True)
+        win.flip()
+        # check for quit (the Esc key)
+        if endExpNow or event.getKeys(keyList=["escape"]):
+            core.quit()
+    #calculate answer
+    chyPos = jsCalc(joy.getY(), yval)
+    dualAns = ""
+    if chyPos >= -0.8 and chyPos <= -0.55:
+        dualAns = "1"
+    elif chyPos >= -0.35 and chyPos <= -0.1:
+        dualAns = "2"
+    elif chyPos >= 0.1 and chyPos <= 0.35:
+        dualAns = "3"
+    elif chyPos >= 0.55 and chyPos <= 0.8:
+        dualAns = "4"
+
+    crosshair.setAutoDraw(False)
+    onecircle.setAutoDraw(False)
+    twocircle.setAutoDraw(False)
+    threecircle.setAutoDraw(False)
+    fourcircle.setAutoDraw(False)
+    onetext.setAutoDraw(False)
+    twotext.setAutoDraw(False)
+    threetext.setAutoDraw(False)
+    fourtext.setAutoDraw(False)
+    win.flip()
+
 def holdScreen(display):
     text = visual.TextStim(win=win, text=display, height=.075)
     text.setAutoDraw(True)
@@ -146,9 +214,8 @@ def holdScreen(display):
 
     while continueRoutine:
         # crosshair updates
-        chxPos = jsCalc(joy.getX(), xval)
         chyPos = jsCalc(joy.getY(), yval)
-        crosshair.setPos((chxPos, chyPos))
+        crosshair.setPos((0, chyPos))
         keysPressed = event.getKeys(keyList=['space'])
         win.flip()
         # check for quit (the Esc key)
@@ -184,9 +251,8 @@ def infoScreen(display):
     timer = clock.CountdownTimer(3)
     while timer.getTime() > 0:
         # crosshair updates
-        chxPos = jsCalc(joy.getX(), xval)
         chyPos = jsCalc(joy.getY(), yval)
-        crosshair.setPos((chxPos, chyPos))
+        crosshair.setPos((0, chyPos))
         crosshair.setAutoDraw(True)
         win.flip()
         # check for quit (the Esc key)
@@ -196,20 +262,22 @@ def infoScreen(display):
     crosshair.setAutoDraw(False)
     win.flip()
 
-def trialScreen(trialNum, startPos):
+def trialScreen(trialNum, dual, startPos):
     endExpNow = False  # flag for 'escape' or other condition => quit the exp
 
     #create visual objects
     #might change in the future
-    trialName = 'Trial ' + str(trialNum)
-    if trialNum > 800:
-        trialName = 'Training Trial ' + str(trialNum%10)
-    text = visual.TextStim(win=win, text=trialName, height=0.075)
+    if dual == False:
+        trialText = "Single"
+    else:
+        trialText = "Dual"
+    text = visual.TextStim(win=win, text=trialText, height=0.075)
     #***replace it with target***
     copy = visual.Circle(win=win, name='copy', units='norm', radius=.125,
-    	fillColor=[1,-1,-1], fillColorSpace='rgb', opacity=.5, depth=-1.0, interpolate=True)
+    	fillColor='red', fillColorSpace='rgb', opacity=1, depth=-1.0, interpolate=True)
     copy.setPos((0, startPos))
     copy.setAutoDraw(True)
+    crosshair.setAutoDraw(True)
 
     t = 0
     trialClock.reset()  # clock
@@ -236,9 +304,8 @@ def trialScreen(trialNum, startPos):
             text.setAutoDraw(True)
 
         # crosshair updates
-        chxPos = jsCalc(joy.getX(), xval)
         chyPos = jsCalc(joy.getY(), yval)
-        crosshair.setPos((chxPos, chyPos))
+        crosshair.setPos((0, chyPos))
         crosshair.setAutoDraw(True)
 
         # check if all components have finished
@@ -255,41 +322,39 @@ def trialScreen(trialNum, startPos):
         if continueRoutine:  # don't flip if routine is over or you get a blank screen
             win.flip()
 
-def runTrial(trialNum, locArr, dual):
+def runTrial(trialNum, locArr, colorArr, dual):
     # ------Prepare to start Routine "trial"-------
     #set up some variables
     trialDist = []
 
     continueRoutine = True
     framesInTarget = 0
+    target.setAutoDraw(True)
 
     # -------Start Routine "trial"-------
     for frameN in range(0,trialTime):
-        target.setAutoDraw(True)
-
         # crosshair updates
-        chxPos = jsCalc(joy.getX(), xval)
         chyPos = jsCalc(joy.getY(), yval)
-        crosshair.setPos((chxPos, chyPos))
+        crosshair.setPos((0, chyPos))
         crosshair.setAutoDraw(True)
         # x position is always 0, y updates to the next value in the array
         currX = 0
         currY = locArr[frameN]
         target.setPos((currX, currY))
+        if dual == True:
+            target.setColor(colorArr[frameN])
+
 
         # save frame information
         trialList.append(trialNum)
-        mousex.append(chxPos)
         mousey.append(chyPos)
         subject.append(expInfo['participant'])
-        xDist = chxPos - currX
         yDist = chyPos - currY
-        hypotenuse = sqrt( abs(xDist*xDist) + abs(yDist*yDist) )
-        xDistance.append(xDist)
+        #hypotenuse = sqrt( abs(xDist*xDist) + abs(yDist*yDist) )
         yDistance.append(yDist)
-        distance.append(hypotenuse-radius)  #this will be included in the csv output
-        trialDist.append(hypotenuse)    #this is used to compute RMSE
-        if max(abs(xDist),abs(yDist)) <= radius:
+        #distance.append(hypotenuse-radius)  #this will be included in the csv output
+        #trialDist.append(hypotenuse)    #this is used to compute RMSE
+        if abs(yDist) <= radius:
             framesInTarget += 1
             onTarget.append(1)
         else:
@@ -309,41 +374,39 @@ def runTrial(trialNum, locArr, dual):
     pctX = 0 # this is % NOT in target
     pctY = 0 # this is % NOT in target
     # what is residual2Sum measuring
-    for num in zip(xDistance[-1*trialTime:], yDistance[-1*trialTime:], trialDist[-1*trialTime:]):
-        residual2Sum += num[2]*num[2]
-        if abs(num[0]) > radius:
-            pctX += 1
-        if abs(num[1]) > radius:
-            pctY += 1
-    pctX = (pctX/(frameN+1))*100 # LEFT HAND
-    pctY = (pctY/(frameN+1))*100 # RIGHT HAND
-    rootMeanSquaredError = sqrt(residual2Sum)
+    #for num in zip(xDistance[-1*trialTime:], yDistance[-1*trialTime:], trialDist[-1*trialTime:]):
+    #    residual2Sum += num[2]*num[2]
+    #    if abs(num[0]) > radius:
+    #        pctX += 1
+    #    if abs(num[1]) > radius:
+    #        pctY += 1
+    #pctX = (pctX/(frameN+1))*100 # LEFT HAND
+    #pctY = (pctY/(frameN+1))*100 # RIGHT HAND
+    #rootMeanSquaredError = sqrt(residual2Sum)
     target.setAutoDraw(False)
-    crosshair.setAutoDraw(False)
 
     for i in range(0, frameN+1):
         onTargetPercent.append(pct)
-        pctXOff.append(pctX)
+        #pctXOff.append(pctX)
         pctYOff.append(pctY)
-        rmse.append(rootMeanSquaredError)
+        #rmse.append(rootMeanSquaredError)
         numFramesInTarget.append(framesInTarget)
 
-    timer = clock.CountdownTimer(3)
+def offScreen(offTime):
+    fixCross = visual.ShapeStim(win=win, name='polygon', vertices='cross',
+	size=(0.05, 0.05), ori=0, pos=(0, 0), lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
+	fillColor='black', fillColorSpace='rgb', opacity=1, depth=0.0, interpolate=True)
+    fixCross.setAutoDraw(True)
+    crosshair.setAutoDraw(False)
+    timer = clock.CountdownTimer(offTime)
     while timer.getTime() > 0:
         win.flip()
         # check for quit (the Esc key)
         if endExpNow or event.getKeys(keyList=["escape"]):
             core.quit()
-
+    fixCross.setAutoDraw(False)
     crosshair.setAutoDraw(True)
 
-def runTraining():
-    #bottom VT
-    trialScreen(901, locArr[0])
-    runTrial(901, locArr, False)
-    #top VT
-    trialScreen(902, locArr[0])
-    runTrial(901, locArr, False)
 
 def runExp():
     for trialNum in range (1,numTrials+1):
@@ -352,8 +415,10 @@ def runExp():
             dual = False
         else:
             dual = True
-        trialScreen(trialNum, locArr[0])
-        runTrial(trialNum, locArr, dual)
+        trialScreen(trialNum, dual, locArr[0])
+        runTrial(trialNum, locArr, colorArr, dual)
+        responseScreen()
+        offScreen(13)
 
 def main():
     # variables
@@ -365,20 +430,15 @@ def main():
     # sandbox happens first
     holdScreen('Use this screen to experiment with moving the crosshairs.')
 
-    # then training
-    infoScreen('TRAINING TRIALS')
-    runTraining() # for even subjects, external training trials are listed as 900s, internals as 800s
-    holdScreen('You have completed the training portion of this experiment.\nPlease notify the experimenter.')
-
     # then experiment blocks
     infoScreen('EXPERIMENT TRIALS')
     runExp()
 
     # Data structure-- NOTE: distance measures from crosshair center to closest edge of target!
     data = pd.DataFrame({'mouseX': mousex, 'mouseY': mousey, 'targetX': targetx, 'targetY': targety,
-                        'distance': distance,'xDist': xDistance, 'yDist': yDistance,
+                        'distance': distance, 'yDist': yDistance,
                         'onTarget': onTarget, 'onTargetPercent': onTargetPercent, 'rmse': rmse,
-                        'framesInTarget': numFramesInTarget, 'pctX': pctXOff, 'pctY': pctYOff,
+                        'framesInTarget': numFramesInTarget, 'pctY': pctYOff,
                         'trialList': trialList, 'blockList': blockList,
                         'subject': subject})
     data.to_csv(filename + '.csv')
